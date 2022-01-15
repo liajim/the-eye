@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.0/ref/settings/
 """
-
+import os
 from pathlib import Path
 import dj_database_url
 
@@ -117,7 +117,7 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-TOKEN_EXPIRED_AFTER_SECONDS = 10 * 60
+TOKEN_EXPIRED_AFTER_SECONDS = 30 * 60
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'eye.authentication.ExpiringTokenAuthentication'
@@ -127,3 +127,7 @@ REST_FRAMEWORK = {
     ],
     'EXCEPTION_HANDLER': 'eye.handlers.custom_exception_handler'
 }
+
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', '')
+CELERY_TASK_TRACK_STARTED = True
+CELERY_TASK_TIME_LIMIT = 30 * 60

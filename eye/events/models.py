@@ -3,7 +3,7 @@ from datetime import datetime
 import pytz
 from django.contrib.auth.models import User
 from django.core.exceptions import ValidationError
-from django.db import models
+from django.db import models, transaction
 from django.utils.translation import gettext_lazy as _
 
 from utils.utils import check_structure
@@ -60,12 +60,28 @@ def no_future(value):
         raise ValidationError('timestamp cannot be in the future.')
 
 
+def data_structure(data, name, category):
+    """Verify data according to name and category"""
+    event_types = EventType.objects.filter(category=category, name=name)
+    if event_types.exists():
+        event_type = event_types.first()
+        if event_type.structure and not event_type.validate_payload(data):
+            raise ValidationError(f"{_('data field is not in the structure as this example:')} {event_type.structure}")
+
+
+class DataPayloadField(models.JSONField):
+    """Override field for validation"""
+    def validate(self, value, model_instance):
+        super().validate(value, model_instance)
+        data_structure(value, model_instance.category, model_instance.name)
+
+
 class Event(models.Model):
     """Class for modeling events"""
     session = models.ForeignKey(Session, verbose_name=_('Session UUID'), on_delete=models.PROTECT)
     category = models.CharField(max_length=50, verbose_name=_('Category'))
     name = models.CharField(max_length=50, verbose_name=_('Name'))
-    data = models.JSONField(verbose_name=_('Payload of data'))
+    data = DataPayloadField(verbose_name=_('Payload of data'))
     timestamp = models.DateTimeField(verbose_name=_('Timestamp'), validators=[no_future])
 
     def __str__(self):
