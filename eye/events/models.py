@@ -18,7 +18,7 @@ class Session(models.Model):
 
     class Meta:
         """Meta Class of Session class"""
-        ordering = ('application__name', 'uuid')
+        ordering = ('application__first_name', 'uuid')
         verbose_name = _('Session')
         verbose_name_plural = _('Sessions')
 
