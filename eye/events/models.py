@@ -60,6 +60,7 @@ class EventType(models.Model):
         """Meta Class of Event class"""
         verbose_name = _('Event Type')
         verbose_name_plural = _('Event Types')
+        unique_together = ['category', 'name']
 
 
 class Event(models.Model):
