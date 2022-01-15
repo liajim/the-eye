@@ -37,14 +37,29 @@ class Session(models.Model):
 
     class Meta:
         """Meta Class of Session class"""
-        ordering = ('application.name', 'uuid')
+        ordering = ('application__name', 'uuid')
         verbose_name = _('Session')
         verbose_name_plural = _('Sessions')
 
 
-class Category(models.Model):
-    """Class for modeling events"""
+class EventType(models.Model):
+    """Class for modeling event type"""
+    category = models.CharField(max_length=50, verbose_name=_('Category'))
     name = models.CharField(max_length=50, verbose_name=_('Name'))
+    structure = models.JSONField(verbose_name=_('Example of payload'), null=True, blank=True)
+
+    def __str__(self):
+        """String representation"""
+        return self.__unicode__()
+
+    def __unicode__(self):
+        """Unicode representation"""
+        return f'{self.category}-{self.name}'
+
+    class Meta:
+        """Meta Class of Event class"""
+        verbose_name = _('Event Type')
+        verbose_name_plural = _('Event Types')
 
 
 class Event(models.Model):
